@@ -1,0 +1,7 @@
+modules:
+  http_non_critical:
+    prober: http
+    http:
+      valid_status_codes:
+        - 200
+        - 204

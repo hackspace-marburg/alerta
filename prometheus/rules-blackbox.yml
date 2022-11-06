@@ -1,0 +1,29 @@
+groups:
+- name: blackbox
+  rules:
+  - alert: BlackboxProbeFailed
+    expr: probe_success == 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: Blackbox probe failed (instance {{ $labels.instance }})
+      description: "Probe failed\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: BlackboxSslCertificateWillExpireSoon
+    expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 21
+    for: 0m
+    labels:
+      severity: warning
+    annotations:
+      summary: Blackbox SSL certificate will expire soon (instance {{ $labels.instance }})
+      description: "SSL certificate expires in 21 days\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: BlackboxSslCertificateWillExpireSoon
+    expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 5
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: Blackbox SSL certificate will expire soon (instance {{ $labels.instance }})
+      description: "SSL certificate expires in five days\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

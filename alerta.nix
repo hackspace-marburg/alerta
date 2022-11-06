@@ -51,8 +51,7 @@
       };
     };
 
-    rules = let
-    in [
+    rules = [
       (builtins.toJSON {
         groups = [
           {
@@ -91,8 +90,70 @@
         ];
       })
     ];
+    ruleFiles = [
+      ./prometheus/rules-blackbox.yml
+      ./prometheus/rules-domain.yml
+    ];
+
+    exporters = {
+      blackbox = {
+        enable = true;
+        listenAddress = "127.0.0.1";
+        configFile = ./prometheus/exporter-blackbox.yml;
+      };
+
+      domain = {
+        enable = true;
+        listenAddress = "127.0.0.1";
+      };
+    };
 
     scrapeConfigs = [
+      {
+        job_name = "blackbox-http";
+        metrics_path = "/probe";
+        params = {
+          module = [ "http_non_critical" ];
+        };
+        static_configs = [{
+          targets = [
+            "https://bbb.hsmr.cc/"
+            "https://chat.hsmr.cc/"
+            "https://grafana.hsmr.cc/"
+            "https://hsmr.cc/"
+            "https://ldap.hsmr.cc/"
+            "https://zammad.hsmr.cc/"
+
+            "https://firmware.marburg.freifunk.net/"
+            "https://marburg.freifunk.net/"
+          ];
+        }];
+        relabel_configs = [
+          { source_labels = [ "__address__" ];    target_label = "__param_target"; }
+          { source_labels = [ "__param_target" ]; target_label = "instance"; }
+          {
+            target_label = "__address__";
+            replacement = "127.0.0.1:${toString config.services.prometheus.exporters.blackbox.port}";
+          }
+        ];
+      }
+      {
+        job_name = "domain";
+        metrics_path = "/probe";
+        static_configs = [{
+          targets = [
+            "hsmr.cc"
+          ];
+        }];
+        relabel_configs = [
+          { source_labels = [ "__address__" ];    target_label = "__param_target"; }
+          { source_labels = [ "__param_target" ]; target_label = "instance"; }
+          {
+            target_label = "__address__";
+            replacement = "127.0.0.1:${toString config.services.prometheus.exporters.domain.port}";
+          }
+        ];
+      }
       {
         job_name = "drehtuer";
         scheme = "http";
