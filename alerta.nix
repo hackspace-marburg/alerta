@@ -21,7 +21,7 @@
         };
         receivers = [{
           name = "all";
-          webhook_configs = [{ send_resolved = false; url = "http://localhost:16320/hsmr-test"; }];
+          webhook_configs = [{ send_resolved = false; url = "http://localhost:16320/hsmr"; }];
         }];
       };
       logLevel = "warn";
@@ -45,7 +45,7 @@
         irc_port = 6697;
         irc_nickname = "alerta";
        # irc_nickname_password = "supersicher"; # TODO
-        irc_channels = [ { name = "#hsmr-test"; } ];
+        irc_channels = [ { name = "#hsmr"; } ];
         use_privmsg = false;
         msg_template = "{{ .Annotations.summary }}";
       };
