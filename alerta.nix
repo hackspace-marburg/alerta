@@ -13,12 +13,20 @@
       enable = true;
       webExternalUrl = "https://alerta.nau.icu";
       configuration = {
-        route = {
-          receiver = "all";
-          group_by = [ "alertname" ];
-          group_wait = "30s";
-          group_interval = "30s"; # change back to 2m
-         # repeat_interval = "24h";
+        route = 
+        let
+          defaultRouteCfg = {
+            receiver = "all";
+            group_by = [ "alertname" ];
+          };
+        in
+        defaultRouteCfg // {
+          routes = [
+            (defaultRouteCfg // {
+              matchers = [ "alertname=\"blackbox\"" ];
+              repeat_interval = "24h";
+            })
+          ];
         };
         receivers = [{
           name = "all";
@@ -55,7 +63,7 @@
       (builtins.toJSON {
         groups = [
           {
-            name = "all";
+            name = "drehtuer";
             rules = [
               {
                 alert = "drehtuer_door_open";
