@@ -103,7 +103,7 @@
       };
 
       domain = {
-        enable = true;
+        enable = false; # disable for now because of faulty notices
         listenAddress = "127.0.0.1";
       };
     };
