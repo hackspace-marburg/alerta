@@ -11,6 +11,7 @@
 
     alertmanager =  {
       enable = true;
+      webExternalUrl = "https://alerta.nau.icu";
       configuration = {
         route = {
           receiver = "all";
@@ -44,7 +45,6 @@
         irc_host = "irc.hackint.org";
         irc_port = 6697;
         irc_nickname = "alerta";
-       # irc_nickname_password = "supersicher"; # TODO
         irc_channels = [ { name = "#hsmr"; } ];
         use_privmsg = false;
         msg_template = "{{ .Annotations.summary }}";
@@ -163,6 +163,13 @@
         }];
       }
     ];
+  };
+
+  services.nginx.virtualHosts."alerta.nau.icu" = {
+    forceSSL = true;
+    enableACME = true;
+
+    locations."/".proxyPass = "http://localhost:${toString config.services.prometheus.alertmanager.port}";
   };
 
 }
