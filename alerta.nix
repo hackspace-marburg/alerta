@@ -1,11 +1,6 @@
 { config, ...}:
 {
 
-  imports = 
-    [
-      ../../../../modules/alertmanager-irc-relay.nix
-    ];
-
   services.prometheus = {
     enable = true;
 
