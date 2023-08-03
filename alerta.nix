@@ -14,6 +14,10 @@
             receiver = "all";
             group_by = [ "alertname" ];
           };
+          tuerstatusRouteCfg = {
+            receiver = "drehtuer";
+            group_by = [ "alertname" ];
+          };
         in
         defaultRouteCfg // {
           routes = [
@@ -21,12 +25,21 @@
               matchers = [ "alertname=\"blackbox\"" ];
               repeat_interval = "24h";
             })
+            (tuerstatusRouteCfg // {
+              matchers = [ "alertname=\"drehtuer\"" ];
+            })
           ];
         };
-        receivers = [{
-          name = "all";
-          webhook_configs = [{ send_resolved = false; url = "http://localhost:16320/hsmr"; }];
-        }];
+        receivers = [
+          {
+            name = "all";
+            webhook_configs = [{ send_resolved = false; url = "http://localhost:16320/hsmr"; }];
+          }
+          {
+            name = "drehtuer";
+            webhook_configs = [{ send_resolved = true; url = "http://localhost:16320/hsmr"; }];
+          }
+        ];
       };
       logLevel = "warn";
     };
@@ -50,7 +63,8 @@
         irc_nickname = "alerta";
         irc_channels = [ { name = "#hsmr"; } ];
         use_privmsg = false;
-        msg_template = "{{ .Annotations.summary }}";
+        # TODO omit .Status and .Labels.alertname if it's drehtuer
+        msg_template = "[{{ .Status }}] {{ .Labels.alertname }}: {{ .Annotations.summary }}";
       };
     };
 
